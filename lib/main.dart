@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/devotee_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/dashboard_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,9 +17,37 @@ void main() {
   runApp(const TempleApp());
 }
 
-class TempleApp extends StatelessWidget {
+class TempleApp extends StatefulWidget {
   const TempleApp({Key? key}) : super(key: key);
 
+  @override
+  _TempleAppState createState() => _TempleAppState();
+}
+
+class _TempleAppState extends State<TempleApp> {
+  bool _isLoggedIn = false;
+  bool _isLoading = true;
+  
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+  
+  Future<void> _checkLoginStatus() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -109,9 +140,17 @@ class TempleApp extends StatelessWidget {
       ),
       themeMode: ThemeMode.system, // Follow system theme
       debugShowCheckedModeBanner: false,
-      home: const DevoteeScreen(),
+      home: _isLoading
+          ? const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
+          : (_isLoggedIn ? const DevoteeScreen() : const LoginScreen()),
       routes: {
         '/home': (context) => const DevoteeScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/dashboard': (context) => const DashboardScreen(),
       },
     );
   }

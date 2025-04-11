@@ -380,10 +380,11 @@ class _DevoteeScreenState extends State<DevoteeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Menu',
+                  'Temple Management',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -409,20 +410,45 @@ class _DevoteeScreenState extends State<DevoteeScreen> {
               ],
             ),
           ),
+          
+          // Main Navigation
+          ListTile(
+            leading: const Icon(Icons.home),
+            title: const Text('Home'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/home');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.dashboard),
+            title: const Text('Dashboard'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/dashboard');
+            },
+          ),
+          
+          const Divider(),
+          
+          // Printer Controls
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text(
+              'PRINTER',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+            ),
+          ),
           ListTile(
             leading: const Icon(Icons.print),
             title: const Text('Connect Printer'),
             onTap: () {
               Navigator.pop(context);
               _scanAndConnectPrinter();
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.home),
-            title: const Text('Home Page'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushReplacementNamed(context, '/home');
             },
           ),
           if (_isPrinterConnected)
@@ -448,6 +474,44 @@ class _DevoteeScreenState extends State<DevoteeScreen> {
                 );
               },
             ),
+            
+          const Divider(),
+          
+          // Account Controls
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text(
+              'ACCOUNT',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.login),
+            title: const Text('Login'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/login');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text('Logout'),
+            onTap: () async {
+              try {
+                await _apiService.logout();
+                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, '/login');
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Logout error: $e')),
+                );
+              }
+            },
+          ),
         ],
       ),
     );

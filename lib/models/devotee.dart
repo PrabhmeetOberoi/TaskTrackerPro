@@ -12,8 +12,8 @@ class Devotee {
     this.phone,
     this.email,
     this.address,
-    required this.createdAt,
-  });
+    DateTime? createdAt,
+  }) : this.createdAt = createdAt ?? DateTime.now();
 
   factory Devotee.fromJson(Map<String, dynamic> json) {
     return Devotee(
@@ -22,7 +22,9 @@ class Devotee {
       phone: json['phone'],
       email: json['email'],
       address: json['address'],
-      createdAt: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()),
+      createdAt: json['created_at'] != null 
+          ? DateTime.parse(json['created_at']) 
+          : null,
     );
   }
 
