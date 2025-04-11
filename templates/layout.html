@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ config.APP_NAME }}</title>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    
+    <!-- Feather Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    
+    <!-- Custom scripts -->
+    <script src="{{ url_for('static', filename='js/chart-config.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bluetooth.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container container">
+            <div class="logo">
+                <a href="{{ url_for('index') }}">{{ config.APP_NAME }}</a>
+            </div>
+            
+            {% if current_user.is_authenticated %}
+            <nav class="nav">
+                <a href="{{ url_for('devotee') }}" class="nav-link {% if request.endpoint == 'devotee' %}active{% endif %}">Devotee</a>
+                <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a>
+                <a href="{{ url_for('add_devotee') }}" class="nav-link {% if request.endpoint == 'add_devotee' %}active{% endif %}">Add Devotee</a>
+                <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
+            </nav>
+            {% endif %}
+            
+            {% if app_activated %}
+            <button class="hamburger-menu">
+                <span class="hamburger-icon"></span>
+            </button>
+            {% endif %}
+        </div>
+    </header>
+    
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Menu</div>
+            <button class="close-sidebar">&times;</button>
+        </div>
+        <div class="sidebar-content">
+            <ul class="sidebar-menu">
+                <li class="sidebar-menu-item">
+                    <a href="{{ url_for('devotee') }}" class="sidebar-menu-link {% if request.endpoint == 'devotee' %}active{% endif %}">
+                        Devotee Page
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="#" id="connect-printer" class="sidebar-menu-link">
+                        Connect Printer
+                    </a>
+                </li>
+                {% if current_user.is_authenticated %}
+                <li class="sidebar-menu-item">
+                    <a href="{{ url_for('dashboard') }}" class="sidebar-menu-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                        Dashboard
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="{{ url_for('add_devotee') }}" class="sidebar-menu-link {% if request.endpoint == 'add_devotee' %}active{% endif %}">
+                        Add Devotee
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="{{ url_for('logout') }}" class="sidebar-menu-link">
+                        Logout
+                    </a>
+                </li>
+                {% else %}
+                <li class="sidebar-menu-item">
+                    <a href="{{ url_for('login') }}" class="sidebar-menu-link {% if request.endpoint == 'login' %}active{% endif %}">
+                        Login
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+            
+            <div class="printer-status">
+                <div>Printer Status:</div>
+                <div id="connected-device-name" class="printer-name">No printer connected</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <!-- Main Content -->
+    <div class="page-container">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+    
+    <!-- Device Selection Modal -->
+    <div id="device-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Select Bluetooth Printer</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Searching for nearby Bluetooth devices...</p>
+                <ul id="device-list" class="device-list"></ul>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">Cancel</button>
+                <button id="connect-selected-device" class="btn">Connect</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Initialize Feather icons -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            feather.replace();
+        });
+    </script>
+</body>
+</html>

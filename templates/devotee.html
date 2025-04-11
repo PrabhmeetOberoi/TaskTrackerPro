@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <h2 class="card-title">Devotee Check-in</h2>
+            
+            <div class="card-content">
+                <p>Enter your Devotee ID below to check in and receive a random item.</p>
+                
+                <form method="POST" action="{{ url_for('devotee') }}" class="devotee-form">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="form-group">
+                        {{ form.devotee_id.label(class="form-label") }}
+                        {{ form.devotee_id(class="form-control") }}
+                        {% if form.devotee_id.errors %}
+                            {% for error in form.devotee_id.errors %}
+                                <div class="field-error">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group" style="text-align: center;">
+                        {{ form.submit(class="btn btn-primary btn-large") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if print_data %}
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <h2 class="card-title">Item Selection Result</h2>
+            
+            <div class="random-item-display">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-gift" style="margin-bottom: 15px;">
+                    <polyline points="20 12 20 22 4 22 4 12"></polyline>
+                    <rect x="2" y="7" width="20" height="5"></rect>
+                    <line x1="12" y1="22" x2="12" y2="7"></line>
+                    <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+                    <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+                </svg>
+                <h3>Devotee: {{ print_data.devotee_name }}</h3>
+                <h3>ID: {{ print_data.devotee_id }}</h3>
+                <p>Date: {{ print_data.date }}</p>
+                <div class="item-name">{{ print_data.item }}</div>
+            </div>
+            
+            <div class="print-button-container">
+                <button id="print-label" class="btn btn-success btn-large" data-print-data="{{ print_data|tojson }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-printer" style="margin-right: 10px;">
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                    Print Label
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if there's a connected printer when page loads
+        updateConnectedDeviceUI();
+    });
+</script>
+{% endblock %}

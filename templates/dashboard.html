@@ -1,0 +1,179 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="card">
+    <h2 class="card-title">Dashboard</h2>
+    
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-value">{{ total_visits }}</div>
+            <div class="stat-label">Total Visits</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ daily_visits }}</div>
+            <div class="stat-label">Today's Visits</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ monthly_visits }}</div>
+            <div class="stat-label">This Month</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ yearly_visits }}</div>
+            <div class="stat-label">This Year</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ devotees|length }}</div>
+            <div class="stat-label">Total Devotees</div>
+        </div>
+    </div>
+</div>
+
+<div class="row" id="dashboard-charts">
+    <div class="col-half">
+        <div class="card">
+            <h3 class="card-title">Daily Visits</h3>
+            <div class="chart-container">
+                <canvas id="daily-visits-chart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-half">
+        <div class="card">
+            <h3 class="card-title">Monthly Visits</h3>
+            <div class="chart-container">
+                <canvas id="monthly-visits-chart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-half">
+        <div class="card">
+            <h3 class="card-title">Yearly Visits</h3>
+            <div class="chart-container">
+                <canvas id="yearly-visits-chart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-half">
+        <div class="card">
+            <h3 class="card-title">Top Devotees</h3>
+            <div class="chart-container">
+                <canvas id="devotees-chart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3 class="card-title">Devotee List</h3>
+    
+    <div class="card-content">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th style="text-align: left; padding: 8px; border-bottom: 2px solid #ddd;">Devotee ID</th>
+                    <th style="text-align: left; padding: 8px; border-bottom: 2px solid #ddd;">Name</th>
+                    <th style="text-align: left; padding: 8px; border-bottom: 2px solid #ddd;">Phone</th>
+                    <th style="text-align: left; padding: 8px; border-bottom: 2px solid #ddd;">Email</th>
+                    <th style="text-align: left; padding: 8px; border-bottom: 2px solid #ddd;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for devotee in devotees %}
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">{{ devotee.devotee_id }}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">{{ devotee.name }}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">{{ devotee.phone }}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">{{ devotee.email }}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">
+                        <button class="btn btn-small btn-outline view-devotee-details" data-devotee-id="{{ devotee.devotee_id }}">
+                            View Details
+                        </button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="padding: 20px; text-align: center;">No devotees found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Devotee Details Modal -->
+<div id="devotee-details-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Devotee Details</h2>
+            <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="devotee-details-content">
+                <p>Loading details...</p>
+            </div>
+            <div id="devotee-calendar" class="devotee-calendar"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize view details buttons
+        const viewButtons = document.querySelectorAll('.view-devotee-details');
+        viewButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const devoteeId = this.dataset.devoteeId;
+                const modal = document.getElementById('devotee-details-modal');
+                const calendarDiv = document.getElementById('devotee-calendar');
+                calendarDiv.dataset.devoteeId = devoteeId;
+                
+                // Show modal
+                modal.style.display = 'flex';
+                
+                // Load devotee details
+                fetch(`/api/devotee/${devoteeId}/visits`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const detailsDiv = document.getElementById('devotee-details-content');
+                        
+                        // Format the devotee details
+                        let detailsHtml = `
+                            <h3>${data.devotee.name}</h3>
+                            <p><strong>Devotee ID:</strong> ${data.devotee.id}</p>
+                            <p><strong>Total Visits:</strong> ${data.visits.length}</p>
+                            <h4>Visit History</h4>
+                        `;
+                        
+                        if (data.visits.length > 0) {
+                            detailsHtml += '<ul>';
+                            data.visits.slice(0, 10).forEach(visit => {
+                                detailsHtml += `<li>${visit.date}: ${visit.item}</li>`;
+                            });
+                            detailsHtml += '</ul>';
+                            
+                            if (data.visits.length > 10) {
+                                detailsHtml += `<p>... and ${data.visits.length - 10} more visits</p>`;
+                            }
+                        } else {
+                            detailsHtml += '<p>No visit history available</p>';
+                        }
+                        
+                        detailsDiv.innerHTML = detailsHtml;
+                        
+                        // Initialize the calendar with the devotee's visit data
+                        initDevoteeCalendar();
+                    })
+                    .catch(error => {
+                        console.error('Error fetching devotee details:', error);
+                        document.getElementById('devotee-details-content').innerHTML = `
+                            <p class="error">Error loading devotee details: ${error.message}</p>
+                        `;
+                    });
+            });
+        });
+    });
+</script>
+{% endblock %}

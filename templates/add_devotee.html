@@ -1,0 +1,96 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-two-thirds">
+        <div class="card">
+            <h2 class="card-title">Add New Devotee</h2>
+            
+            <div class="card-content">
+                <form method="POST" action="{{ url_for('add_devotee') }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="form-group">
+                        {{ form.devotee_id.label(class="form-label") }}
+                        {{ form.devotee_id(class="form-control") }}
+                        <div class="form-text">A unique ID for the devotee (e.g., DEV001)</div>
+                        {% if form.devotee_id.errors %}
+                            {% for error in form.devotee_id.errors %}
+                                <div class="field-error">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.name.label(class="form-label") }}
+                        {{ form.name(class="form-control") }}
+                        {% if form.name.errors %}
+                            {% for error in form.name.errors %}
+                                <div class="field-error">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.phone.label(class="form-label") }}
+                        {{ form.phone(class="form-control") }}
+                        {% if form.phone.errors %}
+                            {% for error in form.phone.errors %}
+                                <div class="field-error">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-control") }}
+                        {% if form.email.errors %}
+                            {% for error in form.email.errors %}
+                                <div class="field-error">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.address.label(class="form-label") }}
+                        {{ form.address(class="form-control", rows=3) }}
+                        {% if form.address.errors %}
+                            {% for error in form.address.errors %}
+                                <div class="field-error">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-third">
+        <div class="card">
+            <h3 class="card-title">Instructions</h3>
+            <div class="card-content">
+                <p>Use this form to register new devotees in the system.</p>
+                <p>The Devotee ID should be unique and will be used for check-ins.</p>
+                <p>All fields marked with * are required.</p>
+                
+                <hr style="margin: 20px 0;">
+                
+                <p>After adding a devotee, they will be able to use their ID to check in and receive a random item selection.</p>
+                
+                <div style="margin-top: 20px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info" style="vertical-align: middle; margin-right: 10px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <span>Make sure to provide the devotee with their ID after registration.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

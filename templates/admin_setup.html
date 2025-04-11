@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="login-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shield">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+    </div>
+    <div class="card">
+        <h2 class="card-title">Application Setup</h2>
+        <p>Welcome to the Temple Management System. Let's set up your admin account to get started.</p>
+        
+        <form method="POST" action="{{ url_for('admin_setup') }}">
+            {{ form.hidden_tag() }}
+            
+            <div class="form-group">
+                {{ form.username.label(class="form-label") }}
+                {{ form.username(class="form-control") }}
+                <div class="form-text">Choose a username for the admin account</div>
+                {% if form.username.errors %}
+                    {% for error in form.username.errors %}
+                        <div class="field-error">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                {{ form.email.label(class="form-label") }}
+                {{ form.email(class="form-control") }}
+                <div class="form-text">Enter your email address</div>
+                {% if form.email.errors %}
+                    {% for error in form.email.errors %}
+                        <div class="field-error">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                {{ form.password.label(class="form-label") }}
+                {{ form.password(class="form-control") }}
+                <div class="form-text">Choose a strong password (at least 6 characters)</div>
+                {% if form.password.errors %}
+                    {% for error in form.password.errors %}
+                        <div class="field-error">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                {{ form.confirm_password.label(class="form-label") }}
+                {{ form.confirm_password(class="form-control") }}
+                {% if form.confirm_password.errors %}
+                    {% for error in form.confirm_password.errors %}
+                        <div class="field-error">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary btn-large") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
